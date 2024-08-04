@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@babel/plugin-transform-async-generator-functions": "^7.25.0",
+    "@babel/plugin-transform-class-properties": "^7.24.7",
+    "@babel/plugin-transform-logical-assignment-operators": "^7.24.7",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
+    "@babel/plugin-transform-numeric-separator": "^7.24.7",
+    "@babel/plugin-transform-object-rest-spread": "^7.24.7",
+    "@babel/plugin-transform-optional-catch-binding": "^7.24.7",
+    "@babel/plugin-transform-optional-chaining": "^7.24.8",
+    "glob": "^11.0.0",
+    "rimraf": "^6.0.1"
+  }
+}
