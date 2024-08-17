@@ -11,7 +11,7 @@ exports.getInitialCategories = async (req, res) => {
 };
 
 exports.getFoodOptions = async (req, res) => {
-  const { categoryId, type1, type2, type3 } = req.query;
+  const { categoryId, type1, type2, type3, type4 } = req.query;
   try {
     let query = 'SELECT DISTINCT ';
     let params = [categoryId];
@@ -24,9 +24,12 @@ exports.getFoodOptions = async (req, res) => {
     } else if (!type3) {
       query += 'type3 FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ?';
       params.push(type1, type2);
-    } else {
-      query += '* FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ? AND type3 = ?';
+    } else if (!type4) {
+      query += 'type4 FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ? AND type3 = ?';
       params.push(type1, type2, type3);
+    } else {
+        query += '* FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ? AND type3 = ? AND type4 = ?';
+        params.push(type1, type2, type3, type4);
     }
 
     const [options] = await db.query(query, params);

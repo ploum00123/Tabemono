@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ImageBackground } from 'react-native'
 import React from 'react';
 import * as WebBrowser from "expo-web-browser";
 import { Colors } from '@/constants/Colors';
@@ -28,21 +28,21 @@ export default function LoginScreen() {
 
     const renderItem = () => (
       <>
-        <View style={{
+        <ImageBackground source={require('../assets/images/image.png')}  style={{
           display: 'flex',
           alignItems: 'center',
           marginTop: 100,
           marginBottom: 20,
         }}>
-          <Image source={require('../assets/images/icon.png')} 
+          <Image source={require('../assets/images/image.png')} 
             style={{
               width: 220,
               height: 450,
-              borderRadius: 20,
-              borderWidth: 2,
-              borderColor: '#000'
+              // borderRadius: 20,
+              // borderWidth: 2,
+              // borderColor: '#000'
             }} />
-        </View>
+        </ImageBackground>
         <View style={styles.subContainer}>
           <Text style={{
             fontSize: 30,
@@ -51,14 +51,14 @@ export default function LoginScreen() {
           }}>Sign in with
             <Text style={{
               color:Colors.PRIMARY
-             }}> Community Food </Text>App</Text>
+             }}> Google </Text>gmail</Text>
           <Text style={{
             textAlign: 'center',
             marginVertical: 15,
             fontFamily: 'outfit',
             fontSize: 15,
             color: Colors.GRAY
-          }}>Sign in to access your personalized recipe book</Text>
+          }}>Sign in to access your recommend food at this time</Text>
           <TouchableOpacity style={styles.btn}
           onPress={onPress}
           >
