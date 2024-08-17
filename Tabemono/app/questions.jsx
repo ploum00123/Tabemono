@@ -47,11 +47,11 @@ const FoodSelectionScreen = () => {
       console.log('API Response:', response.data);
       
       if (Array.isArray(response.data) && response.data.length > 0) {
-        const allNull = response.data.every(item => 
-          Object.values(item).every(value => value === null)
-        );
+        // Check if all items have null type4
+        const allType4Null = response.data.every(item => item.type4 === null);
         
-        if (allNull || response.data.length === 1 && Object.values(response.data[0]).every(value => value === null)) {
+        if (allType4Null) {
+          // Redirect to filtered-results page
           router.push({
             pathname: '/filtered-results',
             params: { selections: JSON.stringify(selections) }
@@ -81,7 +81,7 @@ const FoodSelectionScreen = () => {
       console.error('Error fetching options:', error);
     }
   };
-
+  
   useEffect(() => {
     if (step > 0) {
       fetchOptions();
