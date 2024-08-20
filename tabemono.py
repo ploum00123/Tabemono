@@ -3,9 +3,9 @@ import mysql.connector
 
 # ข้อมูลการเชื่อมต่อ MySQL
 conn = mysql.connector.connect(
-    host='localhost',
+    host='9gbovi.stackhero-network.com',
     user='root',
-    password='',
+    password='hnS2a6ElU4OMaltJXyMZ2XKQ7pq2scG4',
     database='tabemono'
 )
 

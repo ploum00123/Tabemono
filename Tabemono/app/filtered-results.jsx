@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.1.253:3000';
+const API_URL = 'https://tabemono-a445c18f4a6d.herokuapp.com';
 
 const FilteredResultsScreen = () => {
   const { selections } = useLocalSearchParams();

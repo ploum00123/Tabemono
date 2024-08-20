@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.1.253:3000';
+const API_URL = 'https://tabemono-a445c18f4a6d.herokuapp.com';
 
 const FoodSelectionScreen = () => {
   const router = useRouter();

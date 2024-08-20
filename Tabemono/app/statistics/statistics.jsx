@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 
-const API_URL = 'http://192.168.1.253:3000';
+const API_URL = 'https://tabemono-a445c18f4a6d.herokuapp.com';
 
 const StatisticsScreen = () => {
   const [stats, setStats] = useState(null);
