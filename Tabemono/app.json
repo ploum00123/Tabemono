@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ploum00123.Tabemono"
+      "package": "com.ploum00123.Tabemono",
+      "permissions": []
     },
     "web": {
       "bundler": "metro",
