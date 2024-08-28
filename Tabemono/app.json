@@ -12,22 +12,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.ploum00123.Tabemono",
-      "permissions": []
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
     "plugins": [
       "expo-router",
       "expo-secure-store"
@@ -42,6 +26,9 @@
       "eas": {
         "projectId": "030f6d8e-1f81-4ed3-a074-787075fa85c3"
       }
+    },
+    "android": {
+      "package": "com.ploum00123.Tabemono"
     }
   }
 }
