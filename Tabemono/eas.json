@@ -10,9 +10,6 @@
         "gradleCommand": ":app:assembleRelease"
       }
     },
-    "preview3": {
-      "developmentClient": true
-    },
     "production": {}
   }
 }
