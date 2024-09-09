@@ -21,7 +21,7 @@ cursor.execute('''
         id VARCHAR(255) NOT NULL PRIMARY KEY,
         gender ENUM('ชาย','หญิง') NOT NULL,
         age INT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                                                                                                                                            
         favorite_food VARCHAR(255),
         dietary_restrictions TEXT,
         last_login TIMESTAMP NULL DEFAULT NULL,

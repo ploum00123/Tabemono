@@ -11,28 +11,40 @@ exports.getInitialCategories = async (req, res) => {
 };
 
 exports.getFoodOptions = async (req, res) => {
-  const { categoryId, type1, type2, type3, type4 } = req.query;
+  const { categoryId, type1, type2, type3 } = req.query;
   try {
     let query = 'SELECT DISTINCT ';
     let params = [categoryId];
+    let selectColumn = 'type1';
 
-    if (!type1) {
-      query += 'type1 FROM food_items WHERE category_id = ?';
-    } else if (!type2) {
-      query += 'type2 FROM food_items WHERE category_id = ? AND type1 = ?';
+    if (type1) {
+      selectColumn = 'type2';
       params.push(type1);
-    } else if (!type3) {
-      query += 'type3 FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ?';
-      params.push(type1, type2);
-    } else if (!type4) {
-      query += 'type4 FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ? AND type3 = ?';
-      params.push(type1, type2, type3);
-    } else {
-        query += '* FROM food_items WHERE category_id = ? AND type1 = ? AND type2 = ? AND type3 = ? AND type4 = ?';
-        params.push(type1, type2, type3, type4);
+    }
+    if (type2) {
+      selectColumn = 'type3';
+      params.push(type2);
+    }
+    if (type3) {
+      selectColumn = 'type4';
+      params.push(type3);
     }
 
+    query += `${selectColumn} FROM food_items WHERE category_id = ?`;
+
+    for (let i = 1; i < params.length; i++) {
+      query += ` AND type${i} = ?`;
+    }
+
+    query += ` AND ${selectColumn} IS NOT NULL`;
+
+    console.log('Executing query:', query);
+    console.log('With params:', params);
+
     const [options] = await db.query(query, params);
+    
+    console.log('Query results:', options);
+
     res.json(options);
   } catch (error) {
     console.error('Error fetching food options:', error);
@@ -41,11 +53,11 @@ exports.getFoodOptions = async (req, res) => {
 };
 
 exports.saveFoodSelection = async (req, res) => {
-  const { user_id, food_category_id, favorite_type, rating, comments } = req.body;
+  const { userId, categoryId, type1, type2, type3, type4 } = req.body;
   try {
     await db.query(
-      'INSERT INTO food_selections (user_id, food_category_id, favorite_type, rating, comments) VALUES (?, ?, ?, ?, ?)',
-      [user_id, food_category_id, favorite_type, rating, comments]
+      'INSERT INTO food_selections (user_id, category_id, type1, type2, type3, type4) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, categoryId, type1, type2, type3, type4]
     );
     res.status(201).json({ message: 'Food selection saved successfully' });
   } catch (error) {

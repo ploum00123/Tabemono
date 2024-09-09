@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-react';
@@ -15,108 +15,80 @@ const FoodSelectionScreen = () => {
   const [selections, setSelections] = useState({});
   const [finalChoice, setFinalChoice] = useState(null);
 
-  useEffect(() => {
-    fetchInitialCategories();
-    if (user) {
-      recordUserLogin();
-    }
-  }, [user]);
-
-  const recordUserLogin = async () => {
-    try {
-      await axios.post(`${API_URL}/api/users/record-login`, { userId: user.id });
-    } catch (error) {
-      console.error('Error recording user login:', error);
-    }
-  };
-
-  const fetchInitialCategories = async () => {
+  const fetchInitialCategories = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/questions/initial-categories`);
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching initial categories:', error);
     }
-  };
+  }, []);
 
-  const fetchOptions = async () => {
+  const fetchOptions = useCallback(async (currentStep, currentSelections) => {
     try {
+      console.log('Fetching options for step:', currentStep, 'with selections:', currentSelections);
       const response = await axios.get(`${API_URL}/api/questions/food-options`, {
-        params: selections
+        params: currentSelections
       });
-      console.log('API Response:', response.data);
+      console.log('Received response:', response.data);
       
       if (Array.isArray(response.data) && response.data.length > 0) {
-        // Check if all items have null type4
-        const allType4Null = response.data.every(item => item.type4 === null);
-        
-        if (allType4Null) {
-          // Redirect to filtered-results page
-          router.push({
-            pathname: '/filtered-results',
-            params: { selections: JSON.stringify(selections) }
-          });
-        } else if (response.data.length === 1 && response.data[0].type4) {
-          setFinalChoice(response.data[0]);
-        } else {
-          const filteredOptions = response.data.filter(item => 
-            Object.values(item).some(value => value !== null)
-          );
-          setOptions(filteredOptions);
-          
-          if (filteredOptions.length === 0) {
-            router.push({
-              pathname: '/filtered-results',
-              params: { selections: JSON.stringify(selections) }
-            });
-          }
-        }
+        setOptions(response.data);
       } else {
         router.push({
           pathname: '/filtered-results',
-          params: { selections: JSON.stringify(selections) }
+          params: { selections: JSON.stringify(currentSelections) }
         });
       }
     } catch (error) {
       console.error('Error fetching options:', error);
     }
-  };
-  
-  useEffect(() => {
-    if (step > 0) {
-      fetchOptions();
-    }
-  }, [step, selections]);
+  }, [router]);
 
-  const handleSelection = async (item) => {
-    const newSelections = { ...selections };
+  useEffect(() => {
     if (step === 0) {
-      newSelections.categoryId = item.id;
+      fetchInitialCategories();
     } else {
-      const typeKey = `type${step}`;
-      newSelections[typeKey] = item[typeKey] || item;
+      fetchOptions(step, selections);
     }
-    setSelections(newSelections);
-    setStep(step + 1);
+  }, [step, selections, fetchInitialCategories, fetchOptions]);
+
+  const handleSelection = useCallback(async (item) => {
+    setSelections(prevSelections => {
+      const newSelections = { ...prevSelections };
+      if (step === 0) {
+        newSelections.categoryId = item.id;
+      } else {
+        const typeKey = `type${step}`;
+        newSelections[typeKey] = item[typeKey] || item;
+      }
+      console.log('Updated selections:', newSelections);
+      return newSelections;
+    });
+
+    setStep(prevStep => prevStep + 1);
 
     try {
-      await axios.post(`${API_URL}/api/food/record-selection`, {
+      const selectionToRecord = {
         userId: user.id,
-        categoryId: newSelections.categoryId,
-        type1: newSelections.type1,
-        type2: newSelections.type2,
-        type3: newSelections.type3,
-        type4: newSelections.type4,
-        type5: item.type5 || item
-      });
+        ...selections,
+        [step === 0 ? 'categoryId' : `type${step}`]: item.id || (typeof item === 'object' ? item[`type${step}`] : item)
+      };
+      console.log('Recording selection:', selectionToRecord);
+      await axios.post(`${API_URL}/api/food/record-selection`, selectionToRecord);
     } catch (error) {
       console.error('Error recording selection:', error);
     }
-  };
+  }, [step, user.id, selections]);
 
-  const goToStatistics = () => {
-    router.push('/statistics.jsx');
-  };
+  const goBack = useCallback(() => {
+    setStep(0);
+    setSelections({});
+    setOptions([]);
+    setFinalChoice(null);
+    fetchInitialCategories();
+    console.log('Went back to initial categories');
+  }, [fetchInitialCategories]);
 
   const renderItem = ({ item }) => {
     let displayText;
@@ -148,15 +120,15 @@ const FoodSelectionScreen = () => {
         {finalChoice.image_url && (
           <Image source={{ uri: finalChoice.image_url }} style={styles.foodImage} />
         )}
+        <TouchableOpacity style={styles.backButton} onPress={goBack}>
+          <Text style={styles.backButtonText}>กลับไปเลือกประเภทอาหาร</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.statsButton} onPress={goToStatistics}>
-        <Text style={styles.statsButtonText}>View Statistics</Text>
-      </TouchableOpacity>
       <Text style={styles.questionText}>
         {step === 0 ? 'เลือกประเภทอาหาร:' : `เลือกตัวเลือกที่ ${step}:`}
       </Text>
@@ -166,6 +138,11 @@ const FoodSelectionScreen = () => {
         keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())}
         style={styles.optionList}
       />
+      {step > 0 && (
+        <TouchableOpacity style={styles.backButton} onPress={goBack}>
+          <Text style={styles.backButtonText}>กลับไปเลือกประเภทอาหาร</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -203,6 +180,7 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'cover',
     borderRadius: 5,
+    marginBottom: 20,
   },
   statsButton: {
     position: 'absolute',
@@ -216,6 +194,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#e74c3c',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
