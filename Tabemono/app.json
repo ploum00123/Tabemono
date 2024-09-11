@@ -3,6 +3,7 @@
     "name": "Tabemono",
     "slug": "Tabemono",
     "version": "1.0.0",
+    "scheme": "yourapp",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
